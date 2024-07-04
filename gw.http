@@ -1,0 +1,38 @@
+### GET hello world
+GET http://localhost:8888/hello
+
+### GET gw
+GET http://localhost:8888/gw
+
+### GET gw
+GET http://localhost:8888/ga
+
+### POST user
+POST http://localhost:8888/gw/com.flhai.myrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "com.flhai.myrpc.demo.api.UserService",
+  "methodSign": "findById@1_int",
+  "args": [1]
+}
+
+### POST user
+POST http://localhost:8888/ga/com.flhai.myrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "com.flhai.myrpc.demo.api.UserService",
+  "methodSign": "findById@1_int",
+  "args": [1]
+}
+
+### POST user
+POST http://localhost:8888/ga/com.flhai.myrpc.demo.api.UserService?mock=true
+Content-Type: application/json
+
+{
+  "service": "com.flhai.myrpc.demo.api.UserService",
+  "methodSign": "findById@1_int",
+  "args": [1]
+}

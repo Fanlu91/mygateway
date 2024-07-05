@@ -1,4 +1,4 @@
-package com.flhai.mygateway;
+package com.flhai.mygateway.web.handler;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;

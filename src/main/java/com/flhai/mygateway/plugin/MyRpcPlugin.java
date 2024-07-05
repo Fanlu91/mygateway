@@ -1,5 +1,6 @@
-package com.flhai.mygateway;
+package com.flhai.mygateway.plugin;
 
+import com.flhai.mygateway.AbstractGatewayPlugin;
 import com.flhai.myrpc.core.api.LoadBalancer;
 import com.flhai.myrpc.core.cluster.RandomLoadBalancer;
 import com.flhai.myrpc.core.meta.InstanceMeta;
@@ -10,29 +11,24 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-/**
- * 相比router处理，灵活性更强
- * <p>
- * 可以满足串联的需求
- */
-@Component("gatewayWebHandler")
-public class GatewayWebHandler implements WebHandler {
-
+@Component("myRpcPlugin")
+public class MyRpcPlugin extends AbstractGatewayPlugin {
     @Autowired
     RegistryCenter registryCenter;
+    private static final String NAME = "myrpc";
+    private String prefix = GATEWAY_PREFIX + "/" + NAME + "/";
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange) {
+    public Mono<Void> doHandle(ServerWebExchange exchange) {
+        System.out.println("===> MyRpcPlugin");
         // 1. 获取服务名
-        String serviceName = exchange.getRequest().getPath().value().substring(4);
+        String serviceName = exchange.getRequest().getPath().value().substring(prefix.length());
         // 2. 通过rc获取活着的服务实例
         ServiceMeta serviceMeta = ServiceMeta.builder()
                 .name(serviceName)
@@ -58,16 +54,20 @@ public class GatewayWebHandler implements WebHandler {
         // 7. 组装报文
         exchange.getResponse().getHeaders().add("Content-Type", "application/json");
         exchange.getResponse().getHeaders().add("com.flhai.mygateway.version", "1.0");
+        exchange.getResponse().getHeaders().add("com.flhai.mygateway.plugin", NAME);
         return bodyMono.flatMap(s -> {
             return exchange.getResponse().writeWith(
                     Mono.just(exchange.getResponse().bufferFactory().wrap(s.getBytes())));
         });
-
     }
-//    @Override
-//    public Mono<Void> handle(ServerWebExchange exchange) {
-//        return exchange.getResponse().writeWith(
-//                Mono.just(exchange.getResponse().bufferFactory().wrap("hello mygateway web handler".getBytes())));
-//    }
 
+    @Override
+    public boolean doSupport(ServerWebExchange exchange) {
+        return exchange.getRequest().getPath().value().startsWith(prefix);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

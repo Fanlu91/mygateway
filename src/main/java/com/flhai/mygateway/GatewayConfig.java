@@ -12,6 +12,8 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 
 import java.util.Properties;
 
+import static com.flhai.mygateway.GatewayPlugin.GATEWAY_PREFIX;
+
 
 @Configuration
 public class GatewayConfig {
@@ -26,7 +28,7 @@ public class GatewayConfig {
             // 向SimpleUrlHandlerMapping中额外增加一个mapping
             SimpleUrlHandlerMapping handlerMapping = context.getBean(SimpleUrlHandlerMapping.class);
             Properties mappings = new Properties();
-            mappings.put("/ga/**", "gatewayWebHandler");
+            mappings.put(GATEWAY_PREFIX+"/**", "gatewayWebHandler");
             handlerMapping.setMappings(mappings);
             handlerMapping.initApplicationContext();
             System.out.println("增加了/ga/** mapping");

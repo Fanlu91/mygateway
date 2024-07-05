@@ -1,4 +1,4 @@
-package com.flhai.mygateway;
+package com.flhai.mygateway.web.handler;
 
 import com.flhai.myrpc.core.api.LoadBalancer;
 import com.flhai.myrpc.core.cluster.RandomLoadBalancer;

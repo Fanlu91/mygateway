@@ -27,8 +27,39 @@ Content-Type: application/json
   "args": [1]
 }
 
-### POST user
+### POST user mocked
 POST http://localhost:8888/ga/com.flhai.myrpc.demo.api.UserService?mock=true
+Content-Type: application/json
+
+{
+  "service": "com.flhai.myrpc.demo.api.UserService",
+  "methodSign": "findById@1_int",
+  "args": [1]
+}
+
+
+### POST user myrpc
+POST http://localhost:8888/ga/myrpc/com.flhai.myrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "com.flhai.myrpc.demo.api.UserService",
+  "methodSign": "findById@1_int",
+  "args": [1]
+}
+
+### POST user direct
+POST http://localhost:8888/ga/direct/com.flhai.myrpc.demo.api.UserService
+Content-Type: application/json
+
+{
+  "service": "com.flhai.myrpc.demo.api.UserService",
+  "methodSign": "findById@1_int",
+  "args": [1]
+}
+
+### POST user direct with backend
+POST http://localhost:8888/ga/direct/com.flhai.myrpc.demo.api.UserService?backend=http://localhost:8081/myrpc
 Content-Type: application/json
 
 {

@@ -1,6 +1,5 @@
 package com.flhai.mygateway.plugin;
 
-import com.flhai.mygateway.AbstractGatewayPlugin;
 import com.flhai.myrpc.core.api.LoadBalancer;
 import com.flhai.myrpc.core.cluster.RandomLoadBalancer;
 import com.flhai.myrpc.core.meta.InstanceMeta;
@@ -25,7 +24,7 @@ public class MyRpcPlugin extends AbstractGatewayPlugin {
     private String prefix = GATEWAY_PREFIX + "/" + NAME + "/";
 
     @Override
-    public Mono<Void> doHandle(ServerWebExchange exchange) {
+    public Mono<Void> doHandle(ServerWebExchange exchange, GatewayPluginChain chain) {
         System.out.println("===> MyRpcPlugin");
         // 1. 获取服务名
         String serviceName = exchange.getRequest().getPath().value().substring(prefix.length());
@@ -56,8 +55,9 @@ public class MyRpcPlugin extends AbstractGatewayPlugin {
         exchange.getResponse().getHeaders().add("com.flhai.mygateway.version", "1.0");
         exchange.getResponse().getHeaders().add("com.flhai.mygateway.plugin", NAME);
         return bodyMono.flatMap(s -> {
-            return exchange.getResponse().writeWith(
-                    Mono.just(exchange.getResponse().bufferFactory().wrap(s.getBytes())));
+            return exchange.getResponse()
+                    .writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(s.getBytes())))
+                    .then(chain.handle(exchange));
         });
     }
 

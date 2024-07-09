@@ -1,20 +1,11 @@
 package com.flhai.mygateway.web.handler;
 
-import com.flhai.mygateway.GatewayPlugin;
-import com.flhai.myrpc.core.api.LoadBalancer;
-import com.flhai.myrpc.core.cluster.RandomLoadBalancer;
-import com.flhai.myrpc.core.meta.InstanceMeta;
-import com.flhai.myrpc.core.meta.ServiceMeta;
-import com.flhai.myrpc.core.registry.RegistryCenter;
+import com.flhai.mygateway.plugin.DefaultGatewayPluginChain;
+import com.flhai.mygateway.plugin.GatewayPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebHandler;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -34,12 +25,9 @@ public class GatewayWebHandler implements WebHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange) {
         System.out.println("===> GatewayWebHandler");
+        System.out.println("plugins: " + plugins);
         if (plugins != null) {
-            for (GatewayPlugin plugin : plugins) {
-                if (plugin.support(exchange)) {
-                    return plugin.handle(exchange);
-                }
-            }
+            return new DefaultGatewayPluginChain(plugins).handle(exchange);
         }
         System.out.println("no supported plugin found");
         String result = """

@@ -1,6 +1,5 @@
 package com.flhai.mygateway.plugin;
 
-import com.flhai.mygateway.AbstractGatewayPlugin;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,7 @@ public class DirectPlugin extends AbstractGatewayPlugin {
     private String prefix = GATEWAY_PREFIX + "/" + NAME + "/";
 
     @Override
-    public Mono<Void> doHandle(ServerWebExchange exchange) {
+    public Mono<Void> doHandle(ServerWebExchange exchange, GatewayPluginChain chain) {
         System.out.println("===> DirectPlugin");
         String backend = exchange.getRequest().getQueryParams().getFirst("backend");
         Flux<DataBuffer> requestBody = exchange.getRequest().getBody();
@@ -24,7 +23,8 @@ public class DirectPlugin extends AbstractGatewayPlugin {
         exchange.getResponse().getHeaders().add("com.flhai.mygateway.plugin", NAME);
 
         if (backend == null || backend.isEmpty()) {
-            return requestBody.flatMap(dataBuffer -> exchange.getResponse().writeWith(Mono.just(dataBuffer))).then();
+            return requestBody.flatMap(dataBuffer -> exchange.getResponse().writeWith(Mono.just(dataBuffer)))
+                    .then(chain.handle(exchange));
         }
 
         // 5. 通过webclient发送请求
@@ -38,8 +38,9 @@ public class DirectPlugin extends AbstractGatewayPlugin {
         // 7. 组装报文
 
         return bodyMono.flatMap(s -> {
-            return exchange.getResponse().writeWith(
-                    Mono.just(exchange.getResponse().bufferFactory().wrap(s.getBytes())));
+            return exchange.getResponse()
+                    .writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(s.getBytes())))
+                    .then(chain.handle(exchange));
         });
     }
 

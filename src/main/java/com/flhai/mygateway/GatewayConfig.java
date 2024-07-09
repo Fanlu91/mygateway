@@ -4,7 +4,6 @@ import com.flhai.myrpc.core.registry.RegistryCenter;
 import com.flhai.myrpc.core.registry.my.MyRegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.cloud.context.properties.ConfigurationPropertiesRebinder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +11,7 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 
 import java.util.Properties;
 
-import static com.flhai.mygateway.GatewayPlugin.GATEWAY_PREFIX;
+import static com.flhai.mygateway.plugin.GatewayPlugin.GATEWAY_PREFIX;
 
 
 @Configuration

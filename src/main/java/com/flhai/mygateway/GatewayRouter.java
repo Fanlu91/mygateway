@@ -14,7 +14,8 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 /**
  * 基于函数式编程的路由
  */
-@Component
+//@Component
+@Deprecated
 public class GatewayRouter {
 //    @Autowired
 //    HelloHandler helloHandler;

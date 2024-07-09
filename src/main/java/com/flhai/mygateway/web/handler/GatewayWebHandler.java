@@ -1,5 +1,6 @@
 package com.flhai.mygateway.web.handler;
 
+import com.flhai.mygateway.filter.GatewayFilter;
 import com.flhai.mygateway.plugin.DefaultGatewayPluginChain;
 import com.flhai.mygateway.plugin.GatewayPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,21 +23,25 @@ public class GatewayWebHandler implements WebHandler {
     @Autowired
     List<GatewayPlugin> plugins;
 
+    @Autowired
+    List<GatewayFilter> filters;
+
     @Override
     public Mono<Void> handle(ServerWebExchange exchange) {
         System.out.println("===> GatewayWebHandler");
-        System.out.println("plugins: " + plugins);
-        if (plugins != null) {
-            return new DefaultGatewayPluginChain(plugins).handle(exchange);
+        if (plugins == null || plugins.isEmpty()) {
+            String mock = """
+                    {"result":"no plugin"}
+                    """;
+            return exchange.getResponse()
+                    .writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(mock.getBytes())));
         }
-        System.out.println("no supported plugin found");
-        String result = """
-                {
-                    result: "no supported plugin found"
-                }
-                """;
-        return exchange.getResponse().writeWith(
-                Mono.just(exchange.getResponse().bufferFactory().wrap(result.getBytes())));
+
+        for (GatewayFilter filter : filters) {
+            filter.filter(exchange);
+        }
+
+        return new DefaultGatewayPluginChain(plugins).handle(exchange);
 
     }
 
